@@ -91,10 +91,10 @@ def sendSlackRequest(message):
 
   payload = json.dumps({
     "text" : message,
-    "username" : "Secret Office Surveillance Bot",
-    "channel" : "#general"
+    "username" : SlackConfig["botname"],
+    "channel" : SlackConfig["channel"]
   })
-  requests.post(SLACK_WEBHOOK, data=payload)
+  requests.post(SlackConfig["webhook_url"], data=payload)
 
 
 # Read the config file
@@ -108,7 +108,7 @@ def parseConfigFile():
     sys.exit(0)
 
   try:
-    slack_webhook = configParser.get("Slack", "webhook_url")
+    slackConfig = dict(configParser.items("Slack"))
     know_hosts = dict([(mac, hostname) for hostname, mac in configParser.items("Hosts")])
   except ConfigParser.Error as e:
     print e
@@ -119,13 +119,17 @@ def parseConfigFile():
     print "Oops, you did not specify any known hosts. Please correct your config file."
     sys.exit(0)
 
-  return slack_webhook, know_hosts
+  if not "webhook_url" in slackConfig:
+    print "Oops, you did not set up the Slack integration. Please correct your config file."
+    sys.exit(0)
+
+  return slackConfig, know_hosts
 
 
 # Entry point
 if __name__ == "__main__":
 
-  SLACK_WEBHOOK, KNOWN_HOSTS = parseConfigFile()
+  SlackConfig, KNOWN_HOSTS = parseConfigFile()
 
   # Initialize. Noone is here yet
   activeHosts = set()
@@ -134,7 +138,6 @@ if __name__ == "__main__":
 
     scannedHosts = [host["mac"] for host in scan() if "mac" in host]
     recognizedHosts = set([KNOWN_HOSTS[host] for host in scannedHosts if host in KNOWN_HOSTS])
-    print recognizedHosts
 
     # who joined the network?
     newHosts = recognizedHosts - activeHosts
