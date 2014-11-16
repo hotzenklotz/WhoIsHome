@@ -3,8 +3,6 @@
 import nmap
 import time
 import socket
-import fcntl
-import struct
 import json
 import sys
 import requests
@@ -38,31 +36,8 @@ def scan():
 
 # Get your local network IP address. e.g. 192.168.178.X
 def get_lan_ip():
-  def get_interface_ip(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',
-                            ifname[:15]))[20:24])
 
-  ip = socket.gethostbyname(socket.gethostname())
-  if ip.startswith("127.") and os.name != "nt":
-    interfaces = [
-        "eth0",
-        "eth1",
-        "eth2",
-        "wlan0",
-        "wlan1",
-        "wifi0",
-        "ath0",
-        "ath1",
-        "ppp0",
-        ]
-    for ifname in interfaces:
-      try:
-        ip = get_interface_ip(ifname)
-        break
-      except IOError:
-        pass
-  return ip
+  return ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
 
 
 # Build the chat message being send to Slack
