@@ -40,7 +40,7 @@ def get_lan_ip():
   try:
     return ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
   except socket.error as e:
-    print e # probably offline / no internet connection
+    sys.stderr.write(str(e) + "\n") # probably offline / no internet connection
     sys.exit(e.errno)
 
 
@@ -83,23 +83,23 @@ def parseConfigFile():
   config = configParser.read("config.cfg")
 
   if len(config) < 1:
-    print "Oops, couldn't read the config file. Consult the readme."
+    sys.stderr.write("Oops, couldn't read the config file. Consult the readme.\n")
     sys.exit(0)
 
   try:
     slackConfig = dict(configParser.items("Slack"))
     know_hosts = dict([(mac, hostname) for hostname, mac in configParser.items("Hosts")])
   except ConfigParser.Error as e:
-    print e
-    print "Please correct your config file."
+    sys.stderr.write(str(e) + "\n")
+    sys.stderr.write("Please correct your config file.\n")
     sys.exit(0)
 
   if len(know_hosts) == 0:
-    print "Oops, you did not specify any known hosts. Please correct your config file."
+    sys.stderr.write("Oops, you did not specify any known hosts. Please correct your config file.\n")
     sys.exit(0)
 
   if not "webhook_url" in slackConfig:
-    print "Oops, you did not set up the Slack integration. Please correct your config file."
+    sys.stderr.write("Oops, you did not set up the Slack integration. Please correct your config file.\n")
     sys.exit(0)
 
   return slackConfig, know_hosts
