@@ -21,12 +21,12 @@ cp example.cfg config.cfg
 vim config.cfg
 ```
 
-If you wish to run the script on system start you can use the prodvided init.d script (Linux only).
+If you wish to run the script on system start you can use the prodvided init.d script (Linux only). Make sure you modify the init.d script to fit your needs (correct user and paths).
 ```bash
 chmod +x initd.sh
-sudo cp initd.sh /etc/init.d/whoishome.sh
-touch \"/var/log/whoishome.log\" && chown \"root\" \"/var/log/whoishome.log\" # CHANGE USER HERE
-update-rc.d \"whoishome\" defaults
+sudo cp initd.sh /etc/init.d/whoishome
+touch /var/log/whoishome.log && chown root /var/log/whoishome.log # CHANGE USER HERE
+update-rc.d whoishome defaults
 service \"whoishome\" start"
 ```
 

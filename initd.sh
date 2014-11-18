@@ -8,8 +8,8 @@
 # Description:       WhoIsHome: Locally scan your network for known host and post them to Slack
 ### END INIT INFO
 
-SCRIPT=python /home/whoIsHome/whoIsHome.py # CHANGE FOR YOUR NEEDS
-RUNAS=root # CHANGE FOR YOUR NEEDS
+SCRIPT="python ~/whoIsHome/whoIsHome.py" # CHANGE FOR YOUR NEEDS
+RUNAS="root" # CHANGE FOR YOUR NEEDS
 
 PIDFILE=/var/run/whoishome.pid
 LOGFILE=/var/log/whoishome.log
@@ -19,7 +19,7 @@ start() {
     echo 'Service already running' >&2
     return 1
   fi
-  echo 'Starting serviceâ€¦' >&2
+  echo 'Starting service¦' >&2
   local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
   su -c "$CMD" $RUNAS > "$PIDFILE"
   echo 'Service started' >&2
@@ -30,7 +30,7 @@ stop() {
     echo 'Service not running' >&2
     return 1
   fi
-  echo 'Stopping serviceâ€¦' >&2
+  echo 'Stopping service¦' >&2
   kill -15 $(cat "$PIDFILE") && rm -f "$PIDFILE"
   echo 'Service stopped' >&2
 }
