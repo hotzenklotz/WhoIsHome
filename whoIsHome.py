@@ -37,7 +37,11 @@ def scan():
 # Get your local network IP address. e.g. 192.168.178.X
 def get_lan_ip():
 
-  return ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
+  try:
+    return ([(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])
+  except socket.error as e:
+    print e # probably offline / no internet connection
+    sys.exit(e.errno)
 
 
 # Build the chat message being send to Slack
