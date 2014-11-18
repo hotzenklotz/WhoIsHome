@@ -5,6 +5,7 @@ import time
 import socket
 import json
 import sys
+import os
 import requests
 import ConfigParser
 
@@ -79,8 +80,11 @@ def sendSlackRequest(message):
 # Read the config file
 def parseConfigFile():
 
+  scriptDir = os.path.dirname(os.path.realpath(__file__))
+  configDir = os.path.join(scriptDir, "config.cfg")
+
   configParser = ConfigParser.ConfigParser()
-  config = configParser.read("config.cfg")
+  config = configParser.read(configDir)
 
   if len(config) < 1:
     sys.stderr.write("Oops, couldn't read the config file. Consult the readme.\n")
