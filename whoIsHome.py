@@ -92,7 +92,7 @@ def parseConfigFile():
 
   try:
     slackConfig = dict(configParser.items("Slack"))
-    know_hosts = dict([(mac.upper(), hostname) for hostname, mac in configParser.items("Hosts")])
+    know_hosts = dict([(mac.upper(), hostname.title()) for hostname, mac in configParser.items("Hosts")])
   except ConfigParser.Error as e:
     sys.stderr.write(str(e) + "\n")
     sys.stderr.write("Please correct your config file.\n")
