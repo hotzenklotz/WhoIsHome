@@ -7,7 +7,10 @@ import json
 import sys
 import os
 import requests
+import itertools
 import ConfigParser
+from collections import OrderedDict
+from ConfigParser import RawConfigParser
 
 # Scan you local network for all hosts
 def scan():
@@ -81,32 +84,35 @@ def sendSlackRequest(message):
 def parseConfigFile():
 
   scriptDir = os.path.dirname(os.path.realpath(__file__))
-  configDir = os.path.join(scriptDir, "config.cfg")
+  configDir = os.path.join(scriptDir, "config.json")
 
-  configParser = ConfigParser.ConfigParser()
-  config = configParser.read(configDir)
+  jsonFile = open(configDir)
+  config = json.load(jsonFile)
 
   if len(config) < 1:
     sys.stderr.write("Oops, couldn't read the config file. Consult the readme.\n")
     sys.exit(0)
 
   try:
-    slackConfig = dict(configParser.items("Slack"))
-    know_hosts = dict([(mac.upper(), hostname.title()) for hostname, mac in configParser.items("Hosts")])
-  except ConfigParser.Error as e:
-    sys.stderr.write(str(e) + "\n")
-    sys.stderr.write("Please correct your config file.\n")
+    slackConfig = config["slack"]
+    known_hosts = dict()
+
+    for hostname, macs in config["hosts"].iteritems():
+      known_hosts[hostname.title()] = [mac.upper() for mac in macs]
+
+  except KeyError as e:
+    sys.stderr.write("Please correct your config file. Missing section %s .\n" %str(e))
     sys.exit(0)
 
-  if len(know_hosts) == 0:
+  if len(known_hosts) == 0:
     sys.stderr.write("Oops, you did not specify any known hosts. Please correct your config file.\n")
     sys.exit(0)
 
-  if not "webhook_url" in slackConfig:
+  if not "webhook_url" in slackConfig or slackConfig["webhook_url"] is None:
     sys.stderr.write("Oops, you did not set up the Slack integration. Please correct your config file.\n")
     sys.exit(0)
 
-  return slackConfig, know_hosts
+  return slackConfig, known_hosts
 
 
 # Entry point
@@ -120,13 +126,35 @@ if __name__ == "__main__":
   while True:
 
     scannedHosts = [host["mac"] for host in scan() if "mac" in host]
-    recognizedHosts = set([KNOWN_HOSTS[host] for host in scannedHosts if host in KNOWN_HOSTS])
+    print scannedHosts
+
+    recognizedHosts = set()
+    for hostName, macs in KNOWN_HOSTS.iteritems():
+
+      print "knwon ", macs
+
+      for scannedHost in scannedHosts:
+
+        print scannedHost["mac"]
+        if scannedHost["mac"] in macs:
+          recognizedHosts.add(hostname)
+
+
+
+    print recognizedHosts
+    # recognizedHosts = set([KNOWN_HOSTS[host] for host in scannedHosts if host in KNOWN_HOSTS])
 
     # who joined the network?
     newHosts = recognizedHosts - activeHosts
 
     # who left the network?
     leftHosts = activeHosts - recognizedHosts
+
+    print "----------------------------------"
+    print "left",leftHosts
+    print "joined", newHosts
+    print "activeHosts", activeHosts
+    print "recognizedHosts", recognizedHosts
 
     # announce the new and leaving users in Slack
     if len(newHosts) > 0 or len(leftHosts) > 0:
@@ -136,4 +164,4 @@ if __name__ == "__main__":
     activeHosts = recognizedHosts
 
     # wait 60 seconds before trying again
-    time.sleep(60)
+    time.sleep(20)

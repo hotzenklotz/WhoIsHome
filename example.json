@@ -1,0 +1,11 @@
+{
+  "slack" : {
+    "webhook_url" : "https://YOUR-ORGANIZATION.slack.com/services/T02HTMN9K/B23FA44SX/ut54zIlCZlXch8YpPAjrgier3",
+    "channel" : "#general",
+    "botname" : "Secret Office Surveillance Bot"
+  },
+  "hosts" : {
+    "Johnny Appleseed" : ["21:cf:f9:1a:4d:6d", "2a:cf:f9:55:2d:4a"],
+    "Big Bad Wolf" : ["A6:F5:AC:E7:69:0C"]
+  }
+}

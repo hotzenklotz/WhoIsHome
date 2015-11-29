@@ -11,14 +11,15 @@ The network scan occurs every 60 seconds and the program is required to run as r
 pip install requests
 pip install python-nmap
 
-// Find hosts on your local network
+// Discover hosts on your local network
+// and gather their MAC address for the config
 arp -a
 // or
 sudo nmap -sn 192.168.178.0/24
 
 // Setup the config file
-cp example.cfg config.cfg
-vim config.cfg
+cp example.json config.json
+vim config.json
 ```
 
 If you wish to run the script on system start you can use the prodvided init.d script (Linux only). Make sure you modify the init.d script to fit your needs (correct user and paths).
